@@ -24,6 +24,7 @@ import {
 } from "reactstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+
 const index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -42,6 +43,26 @@ const index = () => {
   const [loading, setLoading] = useState(true);
   const MySwal = withReactContent(Swal);
   const [mode, setMode] = useState("create");
+
+  // Custom styles for dropdown z-index fix
+  const customStyles = {
+    table: {
+      style: {
+        overflow: 'visible',
+      },
+    },
+    tableWrapper: {
+      style: {
+        overflow: 'visible',
+      },
+    },
+    responsiveWrapper: {
+      style: {
+        overflow: 'visible',
+      },
+    },
+  };
+
   async function fetchTableData() {
     try {
       setLoading(true);
@@ -60,7 +81,7 @@ const index = () => {
     navigate("/dashboard/pos/product_management/addProduct_index", {
       state: { row },
     });
-    console.log("row",row);
+    console.log("row", row);
   };
 
   useEffect(() => {
@@ -116,6 +137,7 @@ const index = () => {
     navigate("/dashboard/pos/product_management/AddStocks", { state: { row } });
     console.log(row);
   };
+
   const columns = [
     {
       name: "Id",
@@ -123,37 +145,29 @@ const index = () => {
       minWidth: "100px",
       selector: (row, index) => index + 1,
     },
-
     {
       name: "Product Name",
       sortable: true,
-      // minWidth: "150px",
       selector: (row) => row.name,
     },
     {
       name: "Product Type",
       sortable: true,
-      // minWidth: "150px",
       selector: (row) => row.productType,
     },
-
     {
       name: "Vendor",
       sortable: true,
-      // minWidth: "150px",
       selector: (row) => row.vendorUid.vendorName,
     },
-
     {
       name: "Actions",
       minWidth: "150px",
       cell: (row) => {
         const [data, setData] = useState([]);
-
         const MySwal = withReactContent(Swal);
 
         const handleDelete = async (uid) => {
-          // Show confirmation modal
           return MySwal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -168,7 +182,6 @@ const index = () => {
           }).then(async function (result) {
             if (result.value) {
               try {
-                // Call delete API
                 const response = await useJwt.deleteProduct(uid);
                 if (response?.status === 204) {
                   setTableData((prevData) => {
@@ -178,7 +191,7 @@ const index = () => {
                     return {
                       ...prevData,
                       results: newData,
-                      count: prevData.count - 1, // Adjust the count if needed
+                      count: prevData.count - 1,
                     };
                   });
                   MySwal.fire({
@@ -205,8 +218,9 @@ const index = () => {
             }
           });
         };
+
         return (
-          <>
+          <div style={{ position: 'relative', zIndex: 1 }}>
             <UncontrolledDropdown>
               <DropdownToggle
                 className="icon-btn hide-arrow"
@@ -216,29 +230,30 @@ const index = () => {
               >
                 <MoreVertical size={15} />
               </DropdownToggle>
-              <DropdownMenu>
+              <DropdownMenu 
+                style={{ 
+                  zIndex: 9999, 
+                  position: 'absolute',
+                  willChange: 'transform'
+                }}
+              >
                 <DropdownItem onClick={() => handleEdit(row)}>
                   <Edit className="me-50" size={15} />
                   <span className="align-middle">Edit</span>
                 </DropdownItem>
-                {/* 
-                <DropdownItem onClick={() => handleEdit(row)}>
-                  <Eye className="me-50" size={15} />{" "}
-                  <span className="align-middle">View</span>
-                </DropdownItem> */}
 
                 <DropdownItem onClick={() => handleStocks(row)}>
-                  <Package className="me-50" size={15} />{" "}
+                  <Package className="me-50" size={15} />
                   <span className="align-middle">Add Stocks</span>
                 </DropdownItem>
 
                 <DropdownItem onClick={() => handleDelete(row.uid)}>
-                  <Trash className="me-50" size={15} />{" "}
+                  <Trash className="me-50" size={15} />
                   <span className="align-middle">Delete</span>
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
-          </>
+          </div>
         );
       },
     },
@@ -272,7 +287,6 @@ const index = () => {
     );
   };
 
-  // ** Table data to render
   const dataToRender = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -281,12 +295,50 @@ const index = () => {
 
   return (
     <>
+      <style jsx>{`
+        .react-dataTable .rdt_Table {
+          overflow: visible !important;
+        }
+        
+        .react-dataTable .rdt_TableWrapper {
+          overflow: visible !important;
+        }
+        
+        .react-dataTable .rdt_TableBody {
+          overflow: visible !important;
+        }
+        
+        .react-dataTable .rdt_TableRow {
+          overflow: visible !important;
+          position: relative;
+        }
+        
+        .react-dataTable .rdt_TableRow:hover {
+          z-index: 10;
+        }
+        
+        .dropdown-menu {
+          z-index: 9999 !important;
+          position: absolute !important;
+          transform: translate3d(0, 0, 0) !important;
+          box-shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.1) !important;
+        }
+        
+        .table-responsive {
+          overflow: visible !important;
+        }
+        
+        .card-body {
+          overflow: visible !important;
+        }
+      `}</style>
+      
       <Card>
-        <CardBody>
+        <CardBody style={{ overflow: 'visible' }}>
           <CardHeader className="flex-md-row flex-column align-md-items-center align-items-start border-bottom">
             <CardTitle tag="h4">Product List</CardTitle>
             <div className="d-flex mt-md-0 mt-1">
-              <div className="d-flex   justify-content-start gap-2">
+              <div className="d-flex justify-content-start gap-2">
                 <NavItems />
               </div>
             </div>
@@ -312,12 +364,11 @@ const index = () => {
                   <label htmlFor="rows-per-page">Entries</label>
                 </div>
               </Col>
-              <Col xl="6" className="d-flex justify-content-end p-0 ">
-                <div className="w-48  d-flex mx-2">
+              <Col xl="6" className="d-flex justify-content-end p-0">
+                <div className="w-48 d-flex mx-2">
                   <label className="mt-1 mx-1" htmlFor="search-invoice">
                     Search:
                   </label>
-
                   <Input
                     className="dataTable-filter"
                     name="search"
@@ -331,6 +382,7 @@ const index = () => {
               </Col>
             </Row>
           </div>
+          
           {loading ? (
             <div className="text-center">
               <Spinner
@@ -340,7 +392,7 @@ const index = () => {
               />
             </div>
           ) : (
-            <div className="react-dataTable">
+            <div className="react-dataTable" style={{ overflow: 'visible' }}>
               <DataTable
                 noHeader
                 pagination
@@ -350,10 +402,10 @@ const index = () => {
                 columns={columns}
                 sortIcon={<ChevronDown />}
                 className="react-dataTable"
-                // data={tableData}
                 striped
                 paginationComponent={CustomPagination}
                 data={dataToRender()}
+                customStyles={customStyles}
               />
             </div>
           )}

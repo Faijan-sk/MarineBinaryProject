@@ -59,16 +59,16 @@ const CreateUserForm = (props) => {
     reset
   } = useForm({
     defaultValues: {
-      firstName: "Iqbal",
-      lastName: "Khan",
-      emailId: "iq@gmail.com",
-      address: "123 Main St, Apt 4B",
+      firstName: "",
+      lastName: "",
+      emailId: "",
+      address: "",
       countryCode: null,
-      phoneNumber: "2234567890",
-      city: "quebec",
-      state: "Maahrashtra",
-      country: "India",
-      postalCode: "422123",
+      phoneNumber: "",
+      city: "",
+      state: "",
+      country: "",
+      postalCode: "",
     },
   });
 
